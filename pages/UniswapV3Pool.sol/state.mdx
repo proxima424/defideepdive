@@ -1,0 +1,28 @@
+# Pool State
+
+With the pragma version being locked to 0.7.6, `UniswapV3Pool.sol` does not benefit from the
+inbuilt overflow/underflow checks that comes with version 0.8.0 onwards.
+
+So for all `uint256,int256` operations, they import a library called `LowGasSafeMath`
+
+After declaring the libraries to be used for different data types from L#31-L#39, we go on to declare what I call
+`6 public immutable characteristics` of a Uniswap Pool namely :
+
+1. `public immutable factory address` :  
+    L#112 has a modifier called `onlyFactoryOwner` which fetches the public
+    getter owner by calling the factory contract and asserting msg.sender against it
+      `require(msg.sender == IUniswapV3Factory(factory).owner());`
+
+2. `public immutable token0, token1 addresses` : ( Write about it )
+
+3. `uint24 public immutable fee` : ( Write about it )
+
+4. `int24 public immutable tickSpacing` : ( Write about it )
+
+5. `uint128 public immutable maxLiquidityPerTick` : ( Write about it )
+
+With all this public declarings set as immutable initialized in the constructor, EVM allocates them to ( bytecode )?
+As a result, `Slot0` of the contract is empty and is being allocated to an instance of `struct Slot0`.
+
+
+All the fields of this struct hold important information about the state of the pool and is retrieved a lot of times later in core functions.
